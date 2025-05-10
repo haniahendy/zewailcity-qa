@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zewail City Admissions QA System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .chat-box {
+            height: 300px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            overflow-y: auto;
+            border-radius: 5px;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #f1f1f1;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #1a252f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Zewail City Admissions Q&A</h1>
+        <div class="chat-box" id="chatBox"></div>
+        <form id="qaForm">
+            <input type="text" id="questionInput" placeholder="Ask your question about Zewail City admissions..." required>
+            <button type="submit">Ask</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('qaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const question = document.getElementById('questionInput').value;
+            
+            // Add user question to chat
+            const chatBox = document.getElementById('chatBox');
+            const userMessage = document.createElement('div');
+            userMessage.className = 'user-message';
+            userMessage.textContent = 'You: ' + question;
+            chatBox.appendChild(userMessage);
+            
+            // Clear input
+            document.getElementById('questionInput').value = '';
+            
+            // Send to server
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'question=' + encodeURIComponent(question)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const botMessage = document.createElement('div');
+                botMessage.className = 'bot-message';
+                botMessage.textContent = 'Bot: ' + data.answer;
+                chatBox.appendChild(botMessage);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        });
+    </script>
+</body>
+</html>
